@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Access Control Simulator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      color: #38bdf8;
+    }
+
+    .subtitle {
+      margin: 0 0 24px;
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    .field {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #0f172a;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      border: 1px solid #334155;
+      text-align: left;
+    }
+
+    input[type="number"] {
+      width: 90px;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 8px;
+      padding: 12px;
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #0369a1;
+    }
+
+    h2 {
+      margin: 24px 0 12px;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      color: #cbd5e1;
+    }
+
+    .result-box {
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      background: #0f172a;
+      border: 1px solid #334155;
+    }
+
+    .result-box div {
+      margin-top: 8px;
+      font-weight: normal;
+      font-size: 0.92rem;
+      letter-spacing: 0;
+    }
+
+    .granted {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border-color: #22c55e;
+    }
+
+    .denied {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-color: #ef4444;
+    }
+
+    .invalid {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border-color: #f59e0b;
+    }
+
+    .table-note {
+      margin: 0 0 12px;
+      color: #94a3b8;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      text-align: left;
+      background: #0f172a;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #0f172a;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #1e293b;
+      text-align: center;
+    }
+
+    th {
+      background: #334155;
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>ACCESS CONTROL SIMULATOR</h1>
+    <p class="subtitle">Enter 1 for YES or 0 for NO for each condition</p>
+
+    <div class="field">
+      <label for="auth">A: Is the user authenticated?</label>
+      <input type="number" id="auth" min="0" max="1" placeholder="0 or 1" />
+    </div>
+
+    <div class="field">
+      <label for="active">S: Is the account active?</label>
+      <input type="number" id="active" min="0" max="1" placeholder="0 or 1" />
+    </div>
+
+    <div class="field">
+      <label for="role">P: Is the user authorized?</label>
+      <input type="number" id="role" min="0" max="1" placeholder="0 or 1" />
+    </div>
+
+    <button type="button" id="checkBtn">Check Access</button>
+
+    <h2>RESULT</h2>
+    <div id="resultText" class="result-box">Waiting for check...</div>
+
+    <div id="truthSection">
+      <h2>TRUTH TABLE</h2>
+      <p class="table-note">
+        <strong>What is this table?</strong> It shows all 8 possible combinations of 0 and 1 for
+        <strong>A</strong> (Authentication), <strong>S</strong> (Account Status), and
+        <strong>P</strong> (Authorization), along with the final decision <strong>G = A &and; S &and; P</strong>
+        (<strong>1</strong> = Access Granted, <strong>0</strong> = Access Denied).
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>A</th>
+            <th>S</th>
+            <th>P</th>
+            <th>G</th>
+          </tr>
+        </thead>
+        <tbody id="truthTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function accessDecision(authenticated, accountActive, roleAuthorized) {
+      return authenticated && accountActive && roleAuthorized;
+    }
+
+    function isValidBit(value) {
+      return value === 0 || value === 1;
+    }
+
+    function checkAccess() {
+      const rawA = document.getElementById("auth").value.trim();
+      const rawE = document.getElementById("active").value.trim();
+      const rawR = document.getElementById("role").value.trim();
+
+      const resultText = document.getElementById("resultText");
+
+      if (rawA === "" || rawE === "" || rawR === "") {
+        resultText.textContent = "Invalid input! Please enter 0 or 1 in all fields.";
+        resultText.className = "result-box invalid";
+        renderTruthTable(-1, -1, -1);
+        return;
+      }
+
+      const a = Number(rawA);
+      const e = Number(rawE);
+      const r = Number(rawR);
+
+      if (!isValidBit(a) || !isValidBit(e) || !isValidBit(r)) {
+        resultText.textContent = "Invalid input! Only 0 or 1 is allowed.";
+        resultText.className = "result-box invalid";
+        renderTruthTable(-1, -1, -1);
+        return;
+      }
+
+      const result = accessDecision(a === 1, e === 1, r === 1);
+
+      if (result) {
+        resultText.textContent = "ACCESS GRANTED";
+        resultText.className = "result-box granted";
+      } else {
+        resultText.textContent = "ACCESS DENIED";
+        resultText.className = "result-box denied";
+      }
+
+      resultText.insertAdjacentHTML("beforeend",
+        `<div>G = A \u2227 S \u2227 P = ${a} \u2227 ${e} \u2227 ${r} = ${result ? 1 : 0}</div>`);
+
+      if (!result) {
+        const reasons = [];
+        if (a === 0) reasons.push("not authenticated");
+        if (e === 0) reasons.push("account inactive");
+        if (r === 0) reasons.push("not authorized");
+        resultText.insertAdjacentHTML("beforeend",
+          `<div>Reason: ${reasons.join(", ")}</div>`);
+      }
+
+      renderTruthTable(a, e, r);
+    }
+
+    function renderTruthTable(selectedA, selectedE, selectedR) {
+      const tbody = document.getElementById("truthTableBody");
+      tbody.innerHTML = "";
+
+      for (let i = 1; i >= 0; i--) {
+        for (let j = 1; j >= 0; j--) {
+          for (let k = 1; k >= 0; k--) {
+            const g = accessDecision(i === 1, j === 1, k === 1);
+            const gBit = g ? 1 : 0;
+
+            const row = document.createElement("tr");
+            if (i === selectedA && j === selectedE && k === selectedR) {
+              row.style.background = "rgba(56, 189, 248, 0.2)";
+              row.style.fontWeight = "bold";
+            }
+
+            row.innerHTML = `<td>${i}</td><td>${j}</td><td>${k}</td><td>${gBit}</td>`;
+            tbody.appendChild(row);
+          }
+        }
+      }
+    }
+
+    const authInput = document.getElementById("auth");
+    const activeInput = document.getElementById("active");
+    const roleInput = document.getElementById("role");
+
+    function handleEnterNavigation(currentInput, nextAction) {
+      currentInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          nextAction();
+        }
+      });
+    }
+
+    document.getElementById("checkBtn").addEventListener("click", checkAccess);
+    handleEnterNavigation(authInput, () => activeInput.focus());
+    handleEnterNavigation(activeInput, () => roleInput.focus());
+    handleEnterNavigation(roleInput, () => checkAccess());
+
+    renderTruthTable(-1, -1, -1);
+  </script>
+
+</body>
+</html>
